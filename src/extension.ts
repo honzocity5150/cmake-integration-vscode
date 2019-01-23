@@ -19,15 +19,25 @@
  */
 'use strict';
 import * as vscode from 'vscode';
+import {CppToolsApi, getCppToolsApi, Version} from 'vscode-cpptools';
 
 import { WorkspaceManager } from './workspaceManger';
+import { ConfigurationProvider } from './cpptools/configurationProvider';
 
 let manager: WorkspaceManager;
+let cppProvider : ConfigurationProvider;
 let disposables: vscode.Disposable[];
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     disposables = [];
     manager = new WorkspaceManager(context);
+    cppProvider = new ConfigurationProvider();
+
+    let api : CppToolsApi | undefined = await getCppToolsApi(Version.v2);
+    if (api) {
+        api.registerCustomConfigurationProvider(cppProvider);
+        api.notifyReady(cppProvider);
+    }
 
     /* Configure commands */
     disposables.push(

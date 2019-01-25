@@ -4,18 +4,30 @@ import {CustomConfigurationProvider, SourceFileConfiguration, SourceFileConfigur
 import {CodeModel} from '../cmake/protocol';
 import { CMakeClient } from '../cmake/client';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 class ConfigurationProvider implements CustomConfigurationProvider {
   
   name: string = "CMake Integration" ;  
   extensionId: string = "go2sh.cmake-integration";
 
-  private allIncludeDirs : Set<string> = new Set()
+  private clients : Set<CMakeClient> = new Set();
+  private browseConfig : WorkspaceBrowseConfiguration | undefined;
   private sourceFiles : Map<string, SourceFileConfigurationItem> = new Map();
   private clientFiles : Map<CMakeClient, string[]> = new Map();
 
+  constructor() {
+    this.browseConfig = {
+      browsePath: [],
+      compilerPath: "",
+      standard: "c++17",
+      windowsSdkVersion: "12"
+    };
+  }
+
   updateModel(workspace : Uri, codeModel : CodeModel) {
     let projects = codeModel.configurations[0].projects;
+
 
     projects.forEach((project) => {
       project.targets.forEach((target) => {
@@ -49,17 +61,11 @@ class ConfigurationProvider implements CustomConfigurationProvider {
   }
 
   canProvideBrowseConfiguration(token?: CancellationToken): Thenable<boolean> {
-    return Promise.resolve(false);
+    return Promise.resolve(this.browseConfig !== undefined);
   }
 
   provideBrowseConfiguration(token?: CancellationToken): Thenable<WorkspaceBrowseConfiguration> {
-    let config : WorkspaceBrowseConfiguration = {
-      browsePath: [],
-      compilerPath: "",
-      standard: "c++17",
-      windowsSdkVersion: "12"
-    };
-    return Promise.resolve(config);
+    return Promise.resolve(this.browseConfig!);
   }
 
   dispose() {

@@ -22,6 +22,7 @@ import { CMakeClient } from './cmake/client';
 import { ProjectContext, pickProject, pickTarget } from './helpers/quickPick';
 import { Dependency, DependencySpecification, DependencyResolver } from './helpers/dependencyResolver';
 import * as protocol from './cmake/protocol';
+import { ConfigurationProvider } from './cpptools/configurationProvider';
 
 export class WorkspaceManager implements vscode.Disposable {
     private _context: vscode.ExtensionContext;
@@ -34,6 +35,8 @@ export class WorkspaceManager implements vscode.Disposable {
     private _targetItem: vscode.StatusBarItem;
 
     private _currentProject: ProjectContext | undefined;
+
+    private cppProvider : ConfigurationProvider;
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
@@ -59,6 +62,8 @@ export class WorkspaceManager implements vscode.Disposable {
         this._projectItem.command = "cmake.selectProject";
         this._targetItem.command = "cmake.selectTarget";
         this._buildTypeItem.command = "cmake.selectBuildType";
+
+        this.cppProvider = new ConfigurationProvider();
     }
 
     private get currentProject() {
@@ -130,6 +135,7 @@ export class WorkspaceManager implements vscode.Disposable {
             }
         }
         this.updateStatusBar();
+        this.cppProvider.updateClient(e);
     }
 
     private updateStatusBar() {

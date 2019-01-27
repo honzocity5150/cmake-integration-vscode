@@ -25,7 +25,6 @@ import { WorkspaceManager } from './workspaceManger';
 import { ConfigurationProvider } from './cpptools/configurationProvider';
 
 let manager: WorkspaceManager;
-let cppProvider : ConfigurationProvider;
 let disposables: vscode.Disposable[];
 
 export async function activate(context: vscode.ExtensionContext) {

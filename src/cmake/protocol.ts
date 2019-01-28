@@ -19,7 +19,6 @@
  */
 
 import {createConnection, Connection} from './connection';
-import { Address } from 'cluster';
 
 interface Version {
     major: number;

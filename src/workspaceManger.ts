@@ -23,6 +23,7 @@ import { ProjectContext, pickProject, pickTarget } from './helpers/quickPick';
 import { Dependency, DependencySpecification, DependencyResolver } from './helpers/dependencyResolver';
 import * as protocol from './cmake/protocol';
 import { ConfigurationProvider } from './cpptools/configurationProvider';
+import { CppToolsApi, Version, getCppToolsApi } from 'vscode-cpptools';
 
 export class WorkspaceManager implements vscode.Disposable {
     private _context: vscode.ExtensionContext;
@@ -37,6 +38,7 @@ export class WorkspaceManager implements vscode.Disposable {
     private _currentProject: ProjectContext | undefined;
 
     private cppProvider : ConfigurationProvider;
+    private api : CppToolsApi | undefined;
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
@@ -81,6 +83,14 @@ export class WorkspaceManager implements vscode.Disposable {
             return this.currentProject.client;
         }
         return undefined;
+    }
+
+    async registerCppProvider() {
+        this.api = await getCppToolsApi(Version.v2);
+        if (this.api) {
+            this.api.registerCustomConfigurationProvider(this.cppProvider);
+            this.api.notifyReady(this.cppProvider);
+        }
     }
 
     getClientByProjectName(project: string): CMakeClient | undefined {
@@ -197,6 +207,7 @@ export class WorkspaceManager implements vscode.Disposable {
         client.onModelChange((e) => this.onModelChange(e));
 
         this._clients.set(uri.fsPath, client);
+        this.cppProvider.addClient(client);
 
         try {
             await client.start();
@@ -218,6 +229,7 @@ export class WorkspaceManager implements vscode.Disposable {
         if (client) {
             client.dispose();
             this._clients.delete(uri.fsPath);
+            this.cppProvider.deleteClient(client);
         }
         this.updateStatusBar();
     }

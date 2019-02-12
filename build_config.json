@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "visual_studio_options": {
+      "type": "object",
+      "properties": {
+        "CMAKE_GENERATOR_PLATFORM": {
+          "type": "string",
+          "enum": [
+            "Win32",
+            "x64",
+            "ARM",
+            "ARM64"
+          ]
+        },
+        "CMAKE_GNERATOR_TOOLSET": {
+          "type": "string",
+          "pattern": "(v\\d\\d\\d)?((^|,)(version|cuda)=\\d+\\.\\d+|host=(x86|x64))*"
+        },
+        "CMAKE_SYSTEM_NAME": {
+          "type": "string"
+        },
+        "CMAKE_SYSTEM_VERSION": {
+          "type": "string"
+        },
+        "CMAKE_SYSTEM_PROCESSOR": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "CMAKE_GENERATOR_PLATFORM"
+      ]
+    },
+    "toolchain_file": {
+      "type": "string"
+    },
+    "compiler_options": {
+      "type": "object",
+      "properties": {
+        "CMAKE_C_COMPILER": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "buildDirectory": {
+      "type": "string"
+    },
+    "generator": {
+      "type": "string",
+      "enum": [
+        "Ninja"
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "buildDirectory",
+    "generator"
+  ],
+  "oneOf": [
+    {
+      "$ref": "#/definitions"
+    }
+  ]
+}

@@ -300,6 +300,13 @@
                             "project"
                         ]
                     }
+                },
+                "cmake.buildConfigurations": {
+                    "type": "array",
+                    "title": "Build Configurations",
+                    "description": "Add custom build configurations.",
+                    "scope": "resource",
+                    "items": { "$ref": "build_config.json" }
                 }
             }
         },
